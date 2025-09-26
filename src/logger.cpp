@@ -1,11 +1,10 @@
-#include <core/logger.hpp>
 #include <core/file.hpp>
+#include <core/logger.hpp>
 #include <cstdio>
 #include <string>
-
+#include <vector>
 
 using namespace core;
-
 
 namespace {
 struct ConsoleLogger : ILogger {
@@ -16,11 +15,24 @@ std::fwrite(msg.data(), 1, msg.size(), stdout); std::fputc('\n', stdout); std::f
 
 
 struct FileLogger : ILogger {
-File f;
-explicit FileLogger(std::string_view p) : f(p, "a") {}
-void log(std::string_view msg) override {
-f.write(msg.data(), 1, msg.size()); f.write("\n", 1, 1); f.flush();
-}
+    enum class lvl { info = 0, warn, error, count };
+    std::vector<std::string_view> lvl_msg{"info: ", "warn: ", "error: "};
+    File f;
+    std::string_view mode;
+    explicit FileLogger(std::string_view p, std::string_view m = "a")
+        : f(p, m)
+    {}
+    void log(std::string_view msg) override
+    {
+        f.write(msg.data(), 1, msg.size());
+        f.write("\n", 1, 1);
+        f.flush();
+    }
+    void log(std::string_view msg, lvl l)
+    {
+        f.write(&lvl_msg[(unsigned long long) l], 1, lvl_msg[(unsigned long long) l].size());
+        log(msg);
+    }
 };
 } // namespace
 

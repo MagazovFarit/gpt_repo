@@ -5,8 +5,9 @@
 
 namespace core {
 struct IShape {
-virtual ~IShape() = default;
-virtual double area() const = 0;
+    double M_PI = 3.14;
+    virtual ~IShape() = default;
+    virtual double area() const = 0;
 };
 
 
